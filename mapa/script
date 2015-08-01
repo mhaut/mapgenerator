@@ -1,2 +1,0 @@
-python export2RCIS.py mapa.txt
-rcis mapa_rcis.xml
