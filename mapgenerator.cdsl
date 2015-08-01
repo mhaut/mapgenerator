@@ -1,0 +1,11 @@
+import "/robocomp/interfaces/IDSLs/Laser.idsl";
+
+Component mapgenerator
+{
+        Communications
+        {
+                requires Laser;
+	};
+	language Python;
+	gui Qt (QWidget);	
+};
