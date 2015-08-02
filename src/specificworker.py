@@ -75,25 +75,19 @@ class SpecificWorker(GenericWorker):
 		self.captures = []
 		
 		self.sceneLaser = MyGraphicsScene()
-		self.sceneLaser.setSceneRect(0, 0, 10000, 10000)
-
-		self.maxdistance = 11500
+		self.maxRect = 5000
+		self.sceneLaser.setSceneRect(0, 0, self.maxRect, self.maxRect)
+		self.ui.graphicsViewLaser.setScene(self.sceneLaser)
+		
+		self.maxdistance = 5000
 		self.ignoreControl = False
 		self.ignoreActivation = False
 
 	def setParams(self, params):
-		#try:
-		#	par = params["InnerModelPath"]
-		#	innermodel_path=par.value
-		#	innermodel = InnerModel(innermodel_path)
-		#except:
-		#	traceback.print_exc()
-		#	print "Error reading config params"
 		return True
 
 	@QtCore.Slot()
 	def compute(self):
-		#QtCore.qDeleteAll(self.sceneLaser.items())
 		self.sceneLaser.clear()
 		w = 2500
 		self.sceneLaser.addEllipse(-w/2,-w/2,w,w,QtGui.QPen(QtGui.QColor(200,100,0)))
@@ -131,7 +125,15 @@ class SpecificWorker(GenericWorker):
 						pen = QtGui.QPen(QtGui.QColor(0,0,255))
 					else:
 						pen = QtGui.QPen(QtGui.QColor(0,0,0))
-					self.sceneLaser.addEllipse(x-rad, z-rad, rad*2.0, rad*2.0,pen)
+					print x-rad, z-rad
+					
+					# TODO
+					# Transform coordinates to QtSecene Reference
+					# Check Scene Size
+					self.sceneLaser.addEllipse(x-rad+500, z-rad+500, rad*2.0, rad*2.0,pen)					
+					# Example point in 500,500
+					self.sceneLaser.addEllipse(500,500,20,20,pen)
+
 				
 		self.sceneLaser.update()
 
