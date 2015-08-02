@@ -124,12 +124,12 @@ class SpecificWorker(GenericWorker):
 					elif capture.color == "blue":
 						pen = QtGui.QPen(QtGui.QColor(0,0,255))
 					else:
-						pen = QtGui.QPen(QtGui.QColor(0,0,0))
-					print x-rad, z-rad
+						pen = QtGui.QPen(QtGui.QColor(0,0,0))					
 					
 					# TODO
 					# Transform coordinates to QtSecene Reference
 					# Check Scene Size
+					print x-rad, z-rad
 					self.sceneLaser.addEllipse(x-rad+500, z-rad+500, rad*2.0, rad*2.0,pen)					
 					# Example point in 500,500
 					self.sceneLaser.addEllipse(500,500,20,20,pen)
