@@ -22,7 +22,6 @@ import math as m
 import copy
 import pickle
 
-
 from genericworker import *
 
 
