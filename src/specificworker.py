@@ -24,7 +24,6 @@ import pickle
 
 from genericworker import *
 
-añsdlkfjañdlfkja
 
 ROBOCOMP = ''
 try:
