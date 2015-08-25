@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/mainUI.ui'
 #
-# Created: Fri Jul 24 12:14:03 2015
+# Created: Tue Aug 25 15:12:03 2015
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,9 +12,9 @@ from PySide import QtCore, QtGui
 class Ui_guiDlg(object):
     def setupUi(self, guiDlg):
         guiDlg.setObjectName("guiDlg")
-        guiDlg.resize(1132, 608)
-        self.horizontalLayout = QtGui.QHBoxLayout(guiDlg)
-        self.horizontalLayout.setObjectName("horizontalLayout")
+        guiDlg.resize(965, 595)
+        self.gridLayout_2 = QtGui.QGridLayout(guiDlg)
+        self.gridLayout_2.setObjectName("gridLayout_2")
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName("verticalLayout")
         self.label = QtGui.QLabel(guiDlg)
@@ -108,24 +108,22 @@ class Ui_guiDlg(object):
         self.loadButton.setObjectName("loadButton")
         self.horizontalLayout_3.addWidget(self.loadButton)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
-        self.horizontalLayout.addLayout(self.verticalLayout)
-        self.widget = QtGui.QWidget(guiDlg)
-        self.widget.setObjectName("widget")
-        self.gridLayout_2 = QtGui.QGridLayout(self.widget)
-        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.gridLayout_2.setObjectName("gridLayout_2")
-        self.graphicsViewLaser = QtGui.QGraphicsView(self.widget)
+        self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        self.graphicsViewLaser = QtGui.QGraphicsView(guiDlg)
+        self.graphicsViewLaser.setEnabled(True)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(22)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsViewLaser.sizePolicy().hasHeightForWidth())
         self.graphicsViewLaser.setSizePolicy(sizePolicy)
+        self.graphicsViewLaser.setMinimumSize(QtCore.QSize(900, 900))
+        self.graphicsViewLaser.setMaximumSize(QtCore.QSize(900, 900))
         self.graphicsViewLaser.setProperty("cursor", QtCore.Qt.ArrowCursor)
         self.graphicsViewLaser.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.graphicsViewLaser.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.graphicsViewLaser.setInteractive(True)
         self.graphicsViewLaser.setObjectName("graphicsViewLaser")
-        self.gridLayout_2.addWidget(self.graphicsViewLaser, 0, 0, 1, 1)
-        self.horizontalLayout.addWidget(self.widget)
+        self.gridLayout_2.addWidget(self.graphicsViewLaser, 0, 1, 1, 1)
 
         self.retranslateUi(guiDlg)
         QtCore.QMetaObject.connectSlotsByName(guiDlg)

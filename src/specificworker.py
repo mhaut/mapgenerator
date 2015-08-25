@@ -73,7 +73,7 @@ class SpecificWorker(GenericWorker):
 		self.captures = []
 		
 		self.sceneLaser = MyGraphicsScene()
-		self.maxRect = 5000
+		self.maxRect = 50
 		self.sceneLaser.setSceneRect(0, 0, self.maxRect, self.maxRect)
 		self.ui.graphicsViewLaser.setScene(self.sceneLaser)
 		
@@ -128,19 +128,22 @@ class SpecificWorker(GenericWorker):
 					# Transform coordinates to QtSecene Reference
 					# Check Scene Size
 					print x-rad, z-rad
-					self.sceneLaser.addEllipse(x-rad+500, z-rad+500, rad*2.0, rad*2.0,pen)					
-					# Example point in 500,500
-					self.sceneLaser.addEllipse(500,500,20,20,pen)
+					self.sceneLaser.addEllipse(x-rad, z-rad, rad*2.0, rad*2.0,pen)					
+					# Example point in 0,0
+					self.sceneLaser.addEllipse(0,0,5,5,pen)
 
 				
 		self.sceneLaser.update()
 
-		return True
+		
 
 
 	@QtCore.Slot()
 	def on_saveButton_clicked(self):
+		# ALERT : COMPROBAR
 		pickle.dump(self.captures, open('save.pck', 'w'))
+		
+		
 	@QtCore.Slot()
 	def on_loadButton_clicked(self):
 		self.captures = pickle.load(open('save.pck', 'r'))
