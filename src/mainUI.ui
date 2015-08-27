@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>965</width>
-    <height>595</height>
+    <width>1142</width>
+    <height>918</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
-   <string>displaybot</string>
+   <string>Map Generator</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
@@ -60,6 +66,12 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>25</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -246,7 +258,7 @@
       <bool>true</bool>
      </property>
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>22</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -259,18 +271,18 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>900</width>
-       <height>900</height>
+       <width>90000</width>
+       <height>90000</height>
       </size>
      </property>
      <property name="cursor" stdset="0">
       <cursorShape>ArrowCursor</cursorShape>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarAlwaysOn</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+      <enum>Qt::ScrollBarAlwaysOn</enum>
      </property>
      <property name="interactive">
       <bool>true</bool>

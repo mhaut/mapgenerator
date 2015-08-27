@@ -21,6 +21,7 @@ import sys, os, Ice, traceback
 import math as m
 import copy
 import pickle
+import gtk
 
 from genericworker import *
 
@@ -65,70 +66,77 @@ class SpecificWorker(GenericWorker):
 	
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
-		self.timer.timeout.connect(self.compute)
-		self.Period = 100
-		self.timer.start(self.Period)
-		
-		
-		self.captures = []
-		
-		self.sceneLaser = MyGraphicsScene()
+		### GET THE SCREEN SIZE IN ORDER TO SET THE WINDOW SIZE
+		window = gtk.Window()
+		screen = window.get_screen()
+		self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
+		### PREPARE THE SCENE:		
 		self.maxRect = 50
+		self.sceneLaser = MyGraphicsScene()
 		self.sceneLaser.setSceneRect(0, 0, self.maxRect, self.maxRect)
 		self.ui.graphicsViewLaser.setScene(self.sceneLaser)
-		
+		###
 		self.maxdistance = 5000
 		self.ignoreControl = False
 		self.ignoreActivation = False
+		### ATRIBUTTES
+		self.captureFiles =  dict()
+		self.captures = [] # Array de capturas
+		### CONNECT THE COMPUTE
+		self.timer.timeout.connect(self.compute)
+		self.Period = 100
+		self.timer.start(self.Period)
 
 	def setParams(self, params):
 		return True
 
 	@QtCore.Slot()
 	def compute(self):
-		self.sceneLaser.clear()
+		self.sceneLaser.clear()	
+		
 		w = 2500
 		self.sceneLaser.addEllipse(-w/2,-w/2,w,w,QtGui.QPen(QtGui.QColor(200,100,0)))
 		points = self.laser_proxy.getLaserData()
 		rad = 1
 		
-		current = Capture('current', 'black', points)
-		allCaptures = copy.deepcopy(self.captures)
-		if self.ui.showCurrent.isChecked():
-			allCaptures += [current]
+		current = Capture('current', 'black', points) # Guardamos putos en la captura actual
+		allCaptures = copy.deepcopy(self.captures)    # Sacamos todas las capturas salvadas anteriormente
+		# Guardamos en allCaptures  la captura actual (No la estamos metiendo en las capturas salvadas)
+		if self.ui.showCurrent.isChecked(): allCaptures += [current]
+		xr, zr =  self.getRadiusCapture(allCaptures)
 		for capture in allCaptures:
-			if capture.color == "not displayed": continue
-		
+			if capture.color == "not displayed": continue		
 			for point in capture.points:
 				x = 0
 				z = 0
 				if float(point.dist) < self.maxdistance:
-					# Convertimos de polares a cartesianas
+					# Convertimos de polares (r, O) a cartesianas (x, y)
 					x = m.sin(point.angle)*point.dist
 					z = m.cos(point.angle)*point.dist
-					# Rotamos el punto una vez en cartesianas
-					xp = x*m.cos(capture.ry) - z*m.sin(capture.ry)
-					zp = z*m.cos(capture.ry) + x*m.sin(capture.ry)
-					# Desplazamos el punto
-					xpp = xp + capture.tx
-					zpp = zp + capture.tz
+					
+					## Rotamos el punto una vez en cartesianas
+					#xp = x*m.cos(capture.ry) - z*m.sin(capture.ry)
+					#zp = z*m.cos(capture.ry) + x*m.sin(capture.ry)
+					## Desplazamos el punto
+					#xpp = xp + capture.tx
+					#zpp = zp + capture.tz
+
 					# Pintamos
-					x = xpp /self.ui.zoom.value()
-					z = -zpp /self.ui.zoom.value()
-					if capture.color == "red":
-						pen = QtGui.QPen(QtGui.QColor(255,0,0))
-					elif capture.color == "green":
-						pen = QtGui.QPen(QtGui.QColor(0,255,0))
-					elif capture.color == "blue":
-						pen = QtGui.QPen(QtGui.QColor(0,0,255))
-					else:
-						pen = QtGui.QPen(QtGui.QColor(0,0,0))					
+					#x = xpp /self.ui.zoom.value()
+					#z = -zpp /self.ui.zoom.value()
+					x = x /self.ui.zoom.value()
+					z = z /self.ui.zoom.value()
+					if capture.color == "red":     pen = QtGui.QPen(QtGui.QColor(255,0,0))
+					elif capture.color == "green": pen = QtGui.QPen(QtGui.QColor(0,255,0))
+					elif capture.color == "blue":  pen = QtGui.QPen(QtGui.QColor(0,0,255))
+					else:                          pen = QtGui.QPen(QtGui.QColor(0,0,0))					
 					
 					# TODO
 					# Transform coordinates to QtSecene Reference
 					# Check Scene Size
-					print x-rad, z-rad
-					self.sceneLaser.addEllipse(x-rad, z-rad, rad*2.0, rad*2.0,pen)					
+					#print x-rad, z-rad
+					self.sceneLaser.addEllipse(x-rad, -z-rad, rad*2.0, rad*2.0,pen) #FUNCIONA
+					#self.sceneLaser.addEllipse(x-rad, z-rad+(radius/self.ui.zoom.value()), rad*2.0, rad*2.0,pen) #FUNCIONA
 					# Example point in 0,0
 					self.sceneLaser.addEllipse(0,0,5,5,pen)
 
@@ -136,12 +144,50 @@ class SpecificWorker(GenericWorker):
 		self.sceneLaser.update()
 
 		
-
-
+		
+		
+	##################################################
+	### Returns the radius of the laser points captured
+	### TODO CORREGIR PARA QUE LOS PUNTOS DEL LASER QUEDEN CENTRADOS EN EL WIDGET
+	def getRadiusCapture(self, allCaptures):
+		# TODO QUE SOLO COMPRUEBE EL MAYOR ANTERIOR CON LA CAPTURA ACTUAL
+		maxXABS = -1
+		maxZABS = -1
+		maxX = -10000000000
+		maxZ = -10000000000
+		for capture in allCaptures:
+			if capture.color == "not displayed": continue			
+			for point in capture.points:
+				x = m.sin(point.angle)*point.dist
+				z = m.cos(point.angle)*point.dist
+				
+				# Pintamos
+				x = x /self.ui.zoom.value()
+				z = z /self.ui.zoom.value()
+				
+				if maxXABS < abs(x): 
+					maxX    = x
+					maxXABS = abs(x)
+				if maxZABS < abs(z): 
+					maxZ    = z
+					maxZABS = abs(z)
+					
+		return maxXABS/2, maxZABS/2
+		
+		
 	@QtCore.Slot()
 	def on_saveButton_clicked(self):
 		# ALERT : COMPROBAR
-		pickle.dump(self.captures, open('save.pck', 'w'))
+		### CALCULAR LAS LINEAS DEL CONTORNO, Y GUARDARLAS EN CAPTURE [(1-1)(2-2)]
+				#TODO diccionario
+		if not self.ui.name.text() in self.captureFiles.keys():
+			self.captureFiles[self.ui.name.text()] = 0
+		else:
+			self.captureFiles[self.ui.name.text()] += 1		
+		from time import gmtime, strftime
+		timestamp = strftime("%Y-%m-%d_%H-%M", gmtime())
+		filename = self.ui.name.text() + "_" + str(self.captureFiles[self.ui.name.text()]) + timestamp
+		pickle.dump(self.captures, open(filename, 'w'))
 		
 		
 	@QtCore.Slot()

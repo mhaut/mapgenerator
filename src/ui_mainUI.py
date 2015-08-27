@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'src/mainUI.ui'
 #
-# Created: Tue Aug 25 15:12:03 2015
+# Created: Thu Aug 27 16:24:51 2015
 #      by: pyside-uic 0.2.15 running on PySide 1.2.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,7 +12,12 @@ from PySide import QtCore, QtGui
 class Ui_guiDlg(object):
     def setupUi(self, guiDlg):
         guiDlg.setObjectName("guiDlg")
-        guiDlg.resize(965, 595)
+        guiDlg.resize(1140, 918)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(guiDlg.sizePolicy().hasHeightForWidth())
+        guiDlg.setSizePolicy(sizePolicy)
         self.gridLayout_2 = QtGui.QGridLayout(guiDlg)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.verticalLayout = QtGui.QVBoxLayout()
@@ -111,16 +116,16 @@ class Ui_guiDlg(object):
         self.gridLayout_2.addLayout(self.verticalLayout, 0, 0, 1, 1)
         self.graphicsViewLaser = QtGui.QGraphicsView(guiDlg)
         self.graphicsViewLaser.setEnabled(True)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(22)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.graphicsViewLaser.sizePolicy().hasHeightForWidth())
         self.graphicsViewLaser.setSizePolicy(sizePolicy)
         self.graphicsViewLaser.setMinimumSize(QtCore.QSize(900, 900))
-        self.graphicsViewLaser.setMaximumSize(QtCore.QSize(900, 900))
+        self.graphicsViewLaser.setMaximumSize(QtCore.QSize(90000, 90000))
         self.graphicsViewLaser.setProperty("cursor", QtCore.Qt.ArrowCursor)
-        self.graphicsViewLaser.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.graphicsViewLaser.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.graphicsViewLaser.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.graphicsViewLaser.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
         self.graphicsViewLaser.setInteractive(True)
         self.graphicsViewLaser.setObjectName("graphicsViewLaser")
         self.gridLayout_2.addWidget(self.graphicsViewLaser, 0, 1, 1, 1)
@@ -129,7 +134,7 @@ class Ui_guiDlg(object):
         QtCore.QMetaObject.connectSlotsByName(guiDlg)
 
     def retranslateUi(self, guiDlg):
-        guiDlg.setWindowTitle(QtGui.QApplication.translate("guiDlg", "displaybot", None, QtGui.QApplication.UnicodeUTF8))
+        guiDlg.setWindowTitle(QtGui.QApplication.translate("guiDlg", "Map Generator", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("guiDlg", "zoom", None, QtGui.QApplication.UnicodeUTF8))
         self.captureButton.setText(QtGui.QApplication.translate("guiDlg", "capture", None, QtGui.QApplication.UnicodeUTF8))
         self.label_6.setText(QtGui.QApplication.translate("guiDlg", "Activation", None, QtGui.QApplication.UnicodeUTF8))
