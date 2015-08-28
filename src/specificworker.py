@@ -22,6 +22,8 @@ import math as m
 import copy
 import pickle
 import gtk
+import random
+import matplotlib.colors as colors
 
 from genericworker import *
 
@@ -67,8 +69,9 @@ class SpecificWorker(GenericWorker):
 		### GET THE SCREEN SIZE IN ORDER TO SET THE WINDOW SIZE
 		window = gtk.Window()
 		screen = window.get_screen()
-		self.setFixedSize(gtk.gdk.screen_width()-20,gtk.gdk.screen_height()-40)
-		#self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
+		# TODO detectar pantallas
+		#self.setFixedSize(gtk.gdk.screen_width()-20,gtk.gdk.screen_height()-40)
+		self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
 
 		### PREPARE THE SCENE:		
 		self.maxRect = 50
@@ -81,6 +84,12 @@ class SpecificWorker(GenericWorker):
 		self.ignoreActivation = False
 		### ATRIBUTTES
 		self.captureFiles =  dict()
+		self.colorsDict = {'blue':'#0000FF', 'yellow':'#FFFF00', 'green':'#00FF00','red':'#FF0000', 'pink':'#FF00FF', 'orange':'#FF6600','brown':'#660000'}
+		self.ui.colorBox.addItem("not displayed")
+		for color in self.colorsDict.keys():
+			self.ui.colorBox.addItem(color)
+		self.captureColor = 0
+		self.saveNumber = 0
 		self.captureNumber = 0
 		self.captures = [] # Array de capturas
 		### CONNECT THE COMPUTE
@@ -114,28 +123,48 @@ class SpecificWorker(GenericWorker):
 					# Convertimos de polares (r, O) a cartesianas (x, y)
 					x = m.sin(point.angle)*point.dist
 					z = m.cos(point.angle)*point.dist
-					
+
 					## Rotamos el punto una vez en cartesianas
 					#xp = x*m.cos(capture.ry) - z*m.sin(capture.ry)
 					#zp = z*m.cos(capture.ry) + x*m.sin(capture.ry)
 					## Desplazamos el punto
 					#xpp = xp + capture.tx
 					#zpp = zp + capture.tz
-
-					# Pintamos
+					##Pintamos
 					#x = xpp /self.ui.zoom.value()
 					#z = -zpp /self.ui.zoom.value()
+
 					x = x /self.ui.zoom.value()
 					z = z /self.ui.zoom.value()
+
+					#if capture.color == "not displayed": pen = QtGui.QPen(QtGui.QColor(0,0,0))
+					#else:
+						#r = colors.hex2color(self.colorsDict[capture.color])[0]
+						#g = colors.hex2color(self.colorsDict[capture.color])[1]
+						#b = colors.hex2color(self.colorsDict[capture.color])[2]
+						#print "RGB: ",r," ",g," ",b
+						#pen = QtGui.QPen(QtGui.QColor(r,g,b))
+
 					if capture.color == "red":     pen = QtGui.QPen(QtGui.QColor(255,0,0))
 					elif capture.color == "green": pen = QtGui.QPen(QtGui.QColor(0,255,0))
 					elif capture.color == "blue":  pen = QtGui.QPen(QtGui.QColor(0,0,255))
-					else:                          pen = QtGui.QPen(QtGui.QColor(0,0,0))					
-					
+					else:                          pen = QtGui.QPen(QtGui.QColor(0,0,0))
+					if str(self.ui.colorBox.currentText()) == "not displayed":
+						pen = QtGui.QPen(QtGui.QColor(0,0,0))
+					else:
+						pen = QtGui.QPen(QtGui.QColor(self.colorsDict[str(self.ui.colorBox.currentText())]))					
+					#if str(self.ui.colorBox.currentText()) == "not displayed":
+						#pen = QtGui.QPen(QtGui.QColor(0,0,0))
+					#else:
+						#pen = QtGui.QPen(QtGui.QColor(self.colorsDict[str(self.ui.colorBox.currentText())]))
+					#if str(self.ui.colorBox.currentText()) == "not displayed":
+						#pen = QtGui.QPen(QtGui.QColor(0,0,0))
+					#else:
+						#pen = QtGui.QPen(QtGui.QColor(self.colorsDict[str(self.ui.colorBox.currentText())]))
+
 					# TODO
 					# Transform coordinates to QtSecene Reference
 					# Check Scene Size
-					#print x-rad, z-rad
 					self.sceneLaser.addEllipse(x-rad, -z-rad, rad*2.0, rad*2.0,pen) #FUNCIONA
 					#self.sceneLaser.addEllipse(x-rad, z-rad+(radius/self.ui.zoom.value()), rad*2.0, rad*2.0,pen) #FUNCIONA
 					# Example point in 0,0
@@ -190,21 +219,22 @@ class SpecificWorker(GenericWorker):
 		#timestamp = strftime("%Y-%m-%d_%H-%M", gmtime())
 		#filename = self.ui.name.text() + "_" + str(self.captureFiles[self.ui.name.text()]) + timestamp
 		#pickle.dump(self.captures, open(filename, 'w'))
-                outfile = open("save"+str(self.captureNumber)+".info", 'w')
+		outfile = open("save_"+str(self.saveNumber)+".info", 'w')
 		for capture in self.captures:
-                    outfile.write(capture.name + '\n')
-                    outfile.write(capture.color + '\n')
-                    outfile.write(str(capture.points) + '\n')
-		#pickle.dump(self.captures, open("save.pck"+str(self.captureNumber), 'w'))
-		self.captureNumber += 1
+			outfile.write(capture.name +'\n')
+			outfile.write(capture.color + '\n')
+			outfile.write(str(capture.points) + '\n')
+                    
+		#pickle.dump(self.captures, open("save.pck"+str(self.saveNumber), 'w'))
+		self.saveNumber += 1
 		self.captures = []
 
 
 	@QtCore.Slot()
 	def on_loadButton_clicked(self):
             # TODO: captureNumber. Si el programa se cierra captureNumber sera 0, arreglar!!!!!
-            for i in range(self.captureNumber):                
-		self.captures = pickle.load(open("save"+str(self.captureNumber)+".info", 'r'))
+            for i in range(self.saveNumber):                
+		self.captures = pickle.load(open("save"+str(self.saveNumber)+".info", 'r'))
 		for capture in self.captures:
 			self.ui.activationBox.addItem(capture.name)
 			self.ui.controlBox.addItem(capture.name)
@@ -212,24 +242,14 @@ class SpecificWorker(GenericWorker):
 
 	@QtCore.Slot()
 	def on_captureButton_clicked(self):
-            flag = False
-            for i in self.ui.name.text():
-                if not i.isalpha():
-                    flag = True
-                    break
-            if flag:
-                QtGui.QMessageBox.critical(self, "ERROR", 
-                '''The name of capture only alpha digits
-                ''', QtGui.QMessageBox.Ok)
-            else:
+		name = "Capture_"+str(self.captureNumber)
 		points = self.laser_proxy.getLaserData()
-		name = self.ui.name.text()
-		color = "not displayed"
-
+		color = self.colorsDict[str(self.ui.colorBox.currentText())]
+		print color
 		self.captures.append(Capture(name, color, points))
 		self.ui.activationBox.addItem(name)
 		self.ui.controlBox.addItem(name)
-
+		self.captureNumber+=1
 
 	@QtCore.Slot()
 	def on_x_valueChanged(self):
@@ -270,7 +290,6 @@ class SpecificWorker(GenericWorker):
 	
 	
 	#Colores:
-	
 	@QtCore.Slot()
 	def on_activationBox_currentIndexChanged(self):
 		print 'Activation combo box: ', self.ui.activationBox.currentText()
@@ -303,4 +322,3 @@ class SpecificWorker(GenericWorker):
 			if self.ui.activationBox.currentText() == c.name:
 				c.color = newcolor
 				print 'actcolor' , c.name, c.color
-	
