@@ -47,13 +47,12 @@ class Capture(object):
 		self.name = name
 		self.color = color
 		self.points = data
+		# GET BASE STATE ?????????
 		self.tx = 0
 		self.tz = 0
 		self.ry = 0
 
-
 class MyGraphicsScene(QtGui.QGraphicsScene):
-
 	def __init__(self):
 		super(MyGraphicsScene, self).__init__()
 
@@ -63,13 +62,14 @@ class MyGraphicsScene(QtGui.QGraphicsScene):
 		print 'click', x, z
 
 class SpecificWorker(GenericWorker):
-	
 	def __init__(self, proxy_map):
 		super(SpecificWorker, self).__init__(proxy_map)
 		### GET THE SCREEN SIZE IN ORDER TO SET THE WINDOW SIZE
 		window = gtk.Window()
 		screen = window.get_screen()
-		self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
+		self.setFixedSize(gtk.gdk.screen_width()-20,gtk.gdk.screen_height()-40)
+		#self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
+
 		### PREPARE THE SCENE:		
 		self.maxRect = 50
 		self.sceneLaser = MyGraphicsScene()
@@ -81,24 +81,25 @@ class SpecificWorker(GenericWorker):
 		self.ignoreActivation = False
 		### ATRIBUTTES
 		self.captureFiles =  dict()
+		self.captureNumber = 0
 		self.captures = [] # Array de capturas
 		### CONNECT THE COMPUTE
 		self.timer.timeout.connect(self.compute)
 		self.Period = 100
 		self.timer.start(self.Period)
 
+
 	def setParams(self, params):
 		return True
 
+
 	@QtCore.Slot()
 	def compute(self):
-		self.sceneLaser.clear()	
-		
+		self.sceneLaser.clear()			
 		w = 2500
 		self.sceneLaser.addEllipse(-w/2,-w/2,w,w,QtGui.QPen(QtGui.QColor(200,100,0)))
 		points = self.laser_proxy.getLaserData()
 		rad = 1
-		
 		current = Capture('current', 'black', points) # Guardamos putos en la captura actual
 		allCaptures = copy.deepcopy(self.captures)    # Sacamos todas las capturas salvadas anteriormente
 		# Guardamos en allCaptures  la captura actual (No la estamos metiendo en las capturas salvadas)
@@ -139,13 +140,10 @@ class SpecificWorker(GenericWorker):
 					#self.sceneLaser.addEllipse(x-rad, z-rad+(radius/self.ui.zoom.value()), rad*2.0, rad*2.0,pen) #FUNCIONA
 					# Example point in 0,0
 					self.sceneLaser.addEllipse(0,0,5,5,pen)
-
-				
 		self.sceneLaser.update()
 
-		
-		
-		
+
+
 	##################################################
 	### Returns the radius of the laser points captured
 	### TODO CORREGIR PARA QUE LOS PUNTOS DEL LASER QUEDEN CENTRADOS EN EL WIDGET
@@ -171,34 +169,59 @@ class SpecificWorker(GenericWorker):
 				if maxZABS < abs(z): 
 					maxZ    = z
 					maxZABS = abs(z)
-					
 		return maxXABS/2, maxZABS/2
 		
 		
 	@QtCore.Slot()
 	def on_saveButton_clicked(self):
+            if not self.captures:
+                QtGui.QMessageBox.critical(self, "ERROR", 
+                    '''Not points capture!
+                    ''', QtGui.QMessageBox.Ok)
+            else:
 		# ALERT : COMPROBAR
 		### CALCULAR LAS LINEAS DEL CONTORNO, Y GUARDARLAS EN CAPTURE [(1-1)(2-2)]
 				#TODO diccionario
-		if not self.ui.name.text() in self.captureFiles.keys():
-			self.captureFiles[self.ui.name.text()] = 0
-		else:
-			self.captureFiles[self.ui.name.text()] += 1		
-		from time import gmtime, strftime
-		timestamp = strftime("%Y-%m-%d_%H-%M", gmtime())
-		filename = self.ui.name.text() + "_" + str(self.captureFiles[self.ui.name.text()]) + timestamp
-		pickle.dump(self.captures, open(filename, 'w'))
-		
-		
+		#if not self.ui.name.text() in self.captureFiles.keys():
+			#self.captureFiles[self.ui.name.text()] = 0
+		#else:
+			#self.captureFiles[self.ui.name.text()] += 1		
+		#from time import gmtime, strftime
+		#timestamp = strftime("%Y-%m-%d_%H-%M", gmtime())
+		#filename = self.ui.name.text() + "_" + str(self.captureFiles[self.ui.name.text()]) + timestamp
+		#pickle.dump(self.captures, open(filename, 'w'))
+                outfile = open("save"+str(self.captureNumber)+".info", 'w')
+		for capture in self.captures:
+                    outfile.write(capture.name + '\n')
+                    outfile.write(capture.color + '\n')
+                    outfile.write(str(capture.points) + '\n')
+		#pickle.dump(self.captures, open("save.pck"+str(self.captureNumber), 'w'))
+		self.captureNumber += 1
+		self.captures = []
+
+
 	@QtCore.Slot()
 	def on_loadButton_clicked(self):
-		self.captures = pickle.load(open('save.pck', 'r'))
+            # TODO: captureNumber. Si el programa se cierra captureNumber sera 0, arreglar!!!!!
+            for i in range(self.captureNumber):                
+		self.captures = pickle.load(open("save"+str(self.captureNumber)+".info", 'r'))
 		for capture in self.captures:
 			self.ui.activationBox.addItem(capture.name)
 			self.ui.controlBox.addItem(capture.name)
-			
+
+
 	@QtCore.Slot()
 	def on_captureButton_clicked(self):
+            flag = False
+            for i in self.ui.name.text():
+                if not i.isalpha():
+                    flag = True
+                    break
+            if flag:
+                QtGui.QMessageBox.critical(self, "ERROR", 
+                '''The name of capture only alpha digits
+                ''', QtGui.QMessageBox.Ok)
+            else:
 		points = self.laser_proxy.getLaserData()
 		name = self.ui.name.text()
 		color = "not displayed"
@@ -206,6 +229,7 @@ class SpecificWorker(GenericWorker):
 		self.captures.append(Capture(name, color, points))
 		self.ui.activationBox.addItem(name)
 		self.ui.controlBox.addItem(name)
+
 
 	@QtCore.Slot()
 	def on_x_valueChanged(self):
@@ -261,7 +285,6 @@ class SpecificWorker(GenericWorker):
 					self.ui.colorBox.setCurrentIndex(2)
 				elif c.color == 'blue':
 					self.ui.colorBox.setCurrentIndex(3)
-				
 		self.ignoreActivation = False
 	
 	
