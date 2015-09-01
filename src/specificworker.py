@@ -70,8 +70,8 @@ class SpecificWorker(GenericWorker):
 		window = gtk.Window()
 		screen = window.get_screen()
 		# TODO detectar pantallas
-		#self.setFixedSize(gtk.gdk.screen_width()-20,gtk.gdk.screen_height()-40)
-		self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
+		self.setFixedSize(gtk.gdk.screen_width()-20,gtk.gdk.screen_height()-40)
+		#self.setFixedSize(gtk.gdk.screen_width()/2-20,gtk.gdk.screen_height()-20) 
 
 		### PREPARE THE SCENE:		
 		self.maxRect = 50
@@ -144,15 +144,15 @@ class SpecificWorker(GenericWorker):
 						#b = colors.hex2color(self.colorsDict[capture.color])[2]
 						#print "RGB: ",r," ",g," ",b
 						#pen = QtGui.QPen(QtGui.QColor(r,g,b))
-
-					if capture.color == "red":     pen = QtGui.QPen(QtGui.QColor(255,0,0))
+#self.colorsDict = {'blue':'#0000FF', 'yellow':'#FFFF00', 'green':'#00FF00','red':'#FF0000', 'pink':'#FF00FF', 'orange':'#FF6600','brown':'#660000'}
+					if capture.color == "blue":     pen = QtGui.QPen(QtGui.QColor("FF0000"))
 					elif capture.color == "green": pen = QtGui.QPen(QtGui.QColor(0,255,0))
 					elif capture.color == "blue":  pen = QtGui.QPen(QtGui.QColor(0,0,255))
 					else:                          pen = QtGui.QPen(QtGui.QColor(0,0,0))
-					if str(self.ui.colorBox.currentText()) == "not displayed":
-						pen = QtGui.QPen(QtGui.QColor(0,0,0))
-					else:
-						pen = QtGui.QPen(QtGui.QColor(self.colorsDict[str(self.ui.colorBox.currentText())]))					
+					#if str(self.ui.colorBox.currentText()) == "not displayed":
+						#pen = QtGui.QPen(QtGui.QColor(0,0,0))
+					#else:
+						#pen = QtGui.QPen(QtGui.QColor(self.colorsDict[str(self.ui.colorBox.currentText())]))					
 					#if str(self.ui.colorBox.currentText()) == "not displayed":
 						#pen = QtGui.QPen(QtGui.QColor(0,0,0))
 					#else:
